@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git/
+.gitignore
+data/vector_store/
+data/raw/
+notebooks/
+*.md
+```

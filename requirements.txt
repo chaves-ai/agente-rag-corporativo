@@ -1,0 +1,14 @@
+langgraph
+langchain
+langchain-core
+langchain-community
+langchain-groq
+langchain-huggingface
+langchain-text-splitters
+chromadb
+sentence-transformers
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+pydantic

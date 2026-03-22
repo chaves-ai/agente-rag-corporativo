@@ -1,0 +1,33 @@
+# Ambiente virtual
+venv/
+.venv/
+
+# Chaves e segredos
+.env
+
+# Dados locais
+data/vector_store/
+data/raw/
+data/processed/
+data/banco_corporativo.db
+
+# Executáveis
+ngrok.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+services:
+  agente-rag:
+    build: .
+    container_name: agente-rag-corporativo
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - TEMPERATURA=${TEMPERATURA}
+    restart: unless-stopped
