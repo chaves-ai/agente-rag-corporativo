@@ -27,11 +27,11 @@ def validator_node(state: AgentState) -> AgentState:
 
     # Criterio 2 — frases de falha
     frases_falha = [
-        "nao encontrei",
-        "nao tenho informacao",
-        "nao foi possivel",
+        "nao encontrei essa informacao nos documentos disponiveis",
+        "nao tenho informacao sobre",
+        "nao foi possivel encontrar",
     ]
-    if any(f in resposta.lower() for f in frases_falha):
+    if any(f in resposta.lower() for f in frases_falha) and len(resposta) < 200:
         print(f"[VALIDATOR] REPROVADO — resposta indica falha")
         state["qualidade_ok"] = False
         state["tentativas"]   = tentativas + 1
@@ -41,7 +41,6 @@ def validator_node(state: AgentState) -> AgentState:
 
     # Criterio 3 — avaliacao por LLM
     metricas = avaliar_completo(pergunta, contexto, resposta)
-
     registrar_avaliacao(pergunta, resposta, metricas, rota)
 
     state["metricas"]    = metricas

@@ -1,4 +1,4 @@
-langgraph
+﻿langgraph
 langchain
 langchain-core
 langchain-community
@@ -6,7 +6,7 @@ langchain-groq
 langchain-huggingface
 langchain-text-splitters
 chromadb
-sentence-transformers
+sentence-transformers==3.3.1
 python-dotenv
 fastapi
 uvicorn
@@ -16,3 +16,5 @@ pypdf
 python-docx
 openpyxl
 pandas
+
+fastembed

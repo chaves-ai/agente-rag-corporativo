@@ -1,13 +1,19 @@
-services:
+﻿services:
   agente-rag:
     build: .
     container_name: agente-rag-corporativo
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./data:/app/data
       - ./.env:/app/.env
+      - ./scripts:/app/scripts
+      - ./src:/app/src
+      - /mnt/c/Users/Fifa/.cache/huggingface:/root/.cache/huggingface
+      - /mnt/c/Users/Fifa/AppData/Local/Temp/fastembed_cache:/tmp/fastembed_cache
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - TEMPERATURA=${TEMPERATURA}
+      - HF_HUB_OFFLINE=1
+      - TRANSFORMERS_OFFLINE=1
     restart: unless-stopped
