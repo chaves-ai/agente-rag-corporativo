@@ -9,6 +9,7 @@
       - ./.env:/app/.env
       - ./scripts:/app/scripts
       - ./src:/app/src
+      - ./api:/app/api
       - /mnt/c/Users/Fifa/.cache/huggingface:/root/.cache/huggingface
       - /mnt/c/Users/Fifa/AppData/Local/Temp/fastembed_cache:/tmp/fastembed_cache
     environment:

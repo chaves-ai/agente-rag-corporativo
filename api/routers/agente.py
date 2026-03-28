@@ -1,11 +1,25 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Security
+from fastapi.security import APIKeyHeader
 from api.schemas import PerguntaRequest, RespostaResponse, MetricasResponse
 from src.graphs.main_graph import grafo
 from src.utils.dashboard import historico_avaliacoes, registrar_avaliacao
+from src.config import API_KEY
+import secrets
 
 router = APIRouter(prefix="/agente", tags=["Agente RAG"])
 
-# Sessoes em memoria — uma por session_id
+# ── AUTENTICAÇÃO ─────────────────────────────────────────
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+def verificar_api_key(api_key: str = Security(api_key_header)):
+    if not api_key or not secrets.compare_digest(api_key, API_KEY):
+        raise HTTPException(
+            status_code=401,
+            detail="API key inválida ou ausente."
+        )
+    return api_key
+
+# ── SESSÕES ──────────────────────────────────────────────
 sessoes: dict = {}
 
 def get_ou_criar_sessao(session_id: str) -> list:
@@ -35,15 +49,12 @@ def criar_state(pergunta: str, historico: list) -> dict:
     }
 
 @router.post("/perguntar", response_model=RespostaResponse)
-async def perguntar(request: PerguntaRequest):
+async def perguntar(request: PerguntaRequest, api_key: str = Security(verificar_api_key)):
     try:
         historico = get_ou_criar_sessao(request.session_id)
         state     = criar_state(request.pergunta, historico)
         resultado = grafo.invoke(state)
-
-        # Atualiza historico da sessao
         sessoes[request.session_id] = resultado["historico"]
-
         return RespostaResponse(
             resposta     = resultado["resposta"],
             rota         = resultado["rota"],
@@ -53,7 +64,6 @@ async def perguntar(request: PerguntaRequest):
             fontes       = resultado["fontes"],
             session_id   = request.session_id,
         )
-
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -61,7 +71,7 @@ async def perguntar(request: PerguntaRequest):
         )
 
 @router.get("/metricas", response_model=MetricasResponse)
-async def get_metricas():
+async def get_metricas(api_key: str = Security(verificar_api_key)):
     if not historico_avaliacoes:
         return MetricasResponse(
             total_interacoes    = 0,
@@ -70,7 +80,6 @@ async def get_metricas():
             relevancia_media    = 0.0,
             precisao_media      = 0.0,
         )
-
     total = len(historico_avaliacoes)
     return MetricasResponse(
         total_interacoes   = total,
@@ -81,7 +90,7 @@ async def get_metricas():
     )
 
 @router.delete("/sessao/{session_id}")
-async def limpar_sessao(session_id: str):
+async def limpar_sessao(session_id: str, api_key: str = Security(verificar_api_key)):
     if session_id in sessoes:
         del sessoes[session_id]
     return {"mensagem": f"Sessao {session_id} limpa com sucesso"}

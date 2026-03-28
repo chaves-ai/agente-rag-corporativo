@@ -9,6 +9,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GROQ_API_KEY   = os.getenv('GROQ_API_KEY')
 MODELO_LLM     = os.getenv('MODELO_LLM', 'gpt-4o-mini')
 TEMPERATURA    = float(os.getenv('TEMPERATURA', '0'))
+API_KEY        = os.getenv('API_KEY', 'chaves-ai-key-2025')
 
 # ── CAMINHOS ─────────────────────────────────────────
 BASE_DIR       = os.path.dirname(os.path.dirname(__file__))
