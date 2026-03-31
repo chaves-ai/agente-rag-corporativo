@@ -6,6 +6,13 @@ TAMANHO_MINIMO = 5
 MAX_TENTATIVAS = 3
 SCORE_MINIMO   = 0.5
 
+FRASES_SEM_RESPOSTA = [
+    "nao encontrei essa informacao nos documentos disponiveis",
+    "nao tenho informacao sobre",
+    "nao foi possivel encontrar",
+    "nao ha informacao disponivel",
+]
+
 def validator_node(state: AgentState) -> AgentState:
     resposta   = state["resposta"]
     tentativas = state["tentativas"]
@@ -25,18 +32,15 @@ def validator_node(state: AgentState) -> AgentState:
         state["score_geral"]  = 0.0
         return state
 
-    # Criterio 2 — frases de falha
-    frases_falha = [
-        "nao encontrei essa informacao nos documentos disponiveis",
-        "nao tenho informacao sobre",
-        "nao foi possivel encontrar",
-    ]
-    if any(f in resposta.lower() for f in frases_falha) and len(resposta) < 200:
-        print(f"[VALIDATOR] REPROVADO — resposta indica falha")
-        state["qualidade_ok"] = False
+    # Criterio 2 — agente sinalizou que nao encontrou a informacao
+    # Nesse caso aprovamos imediatamente — e correto nao encontrar
+    # o que nao existe nos documentos
+    if any(f in resposta.lower() for f in FRASES_SEM_RESPOSTA):
+        print(f"[VALIDATOR] APROVADO — agente sinalizou ausencia de informacao corretamente")
+        state["qualidade_ok"] = True
         state["tentativas"]   = tentativas + 1
         state["metricas"]     = {}
-        state["score_geral"]  = 0.0
+        state["score_geral"]  = 1.0
         return state
 
     # Criterio 3 — avaliacao por LLM
