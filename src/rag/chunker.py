@@ -24,8 +24,20 @@ def carregar_docx(caminho: str):
     return [Document(page_content=texto, metadata={"source": caminho})]
 
 def carregar_xlsx(caminho: str):
+    import os as _os
+    ext = _os.path.splitext(caminho)[1].lower()
+    if ext == '.csv':
+        import csv
+        documentos = []
+        with open(caminho, encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            linhas = [" | ".join([f"{k}: {v}" for k, v in row.items() if v]) for row in reader]
+        texto = "\n".join(linhas)
+        if texto.strip():
+            documentos.append(Document(page_content=texto, metadata={"source": caminho, "sheet": "csv"}))
+        return documentos
     import openpyxl
-    wb = openpyxl.load_workbook(caminho)
+    wb = openpyxl.load_workbook(caminho, data_only=True)
     documentos = []
 
     for nome_aba in wb.sheetnames:

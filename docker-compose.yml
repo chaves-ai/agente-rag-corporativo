@@ -1,4 +1,4 @@
-﻿services:
+services:
   agente-rag:
     build: .
     container_name: agente-rag-corporativo
@@ -10,8 +10,8 @@
       - ./scripts:/app/scripts
       - ./src:/app/src
       - ./api:/app/api
-      - /mnt/c/Users/Fifa/.cache/huggingface:/root/.cache/huggingface
-      - /mnt/c/Users/Fifa/AppData/Local/Temp/fastembed_cache:/tmp/fastembed_cache
+      - /home/fifa/.cache/huggingface:/root/.cache/huggingface
+      - /home/fifa/.cache/fastembed:/tmp/fastembed_cache
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - TEMPERATURA=${TEMPERATURA}
