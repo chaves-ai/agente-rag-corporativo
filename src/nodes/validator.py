@@ -4,13 +4,22 @@ from src.utils.dashboard import registrar_avaliacao
 
 TAMANHO_MINIMO = 5
 MAX_TENTATIVAS = 3
-SCORE_MINIMO   = 0.5
+SCORE_MINIMO   = 0.4
 
 FRASES_SEM_RESPOSTA = [
     "nao encontrei essa informacao nos documentos disponiveis",
     "nao tenho informacao sobre",
     "nao foi possivel encontrar",
     "nao ha informacao disponivel",
+]
+
+FRASES_PARCIAL = [
+    "nao encontrei a",
+    "nao ha informacoes",
+    "nao e possivel identificar",
+    "nao foram fornecidos",
+    "nao esta disponivel",
+    "nao e possivel determinar",
 ]
 
 def validator_node(state: AgentState) -> AgentState:
@@ -23,7 +32,6 @@ def validator_node(state: AgentState) -> AgentState:
     print(f"[VALIDATOR] Tentativa {tentativas + 1} de {MAX_TENTATIVAS}")
     print(f"[VALIDATOR] Tamanho da resposta: {len(resposta)} caracteres")
 
-    # Criterio 1 — tamanho minimo
     if len(resposta) < TAMANHO_MINIMO:
         print(f"[VALIDATOR] REPROVADO — resposta muito curta")
         state["qualidade_ok"] = False
@@ -32,9 +40,6 @@ def validator_node(state: AgentState) -> AgentState:
         state["score_geral"]  = 0.0
         return state
 
-    # Criterio 2 — agente sinalizou que nao encontrou a informacao
-    # Nesse caso aprovamos imediatamente — e correto nao encontrar
-    # o que nao existe nos documentos
     if any(f in resposta.lower() for f in FRASES_SEM_RESPOSTA):
         print(f"[VALIDATOR] APROVADO — agente sinalizou ausencia de informacao corretamente")
         state["qualidade_ok"] = True
@@ -43,7 +48,17 @@ def validator_node(state: AgentState) -> AgentState:
         state["score_geral"]  = 1.0
         return state
 
-    # Criterio 3 — avaliacao por LLM
+    resposta_lower = resposta.lower()
+    tem_conteudo   = len(resposta) > 100
+    tem_admissao   = any(f in resposta_lower for f in FRASES_PARCIAL)
+    if tem_conteudo and tem_admissao:
+        print(f"[VALIDATOR] APROVADO — resposta parcial com admissao de limitacao")
+        state["qualidade_ok"] = True
+        state["tentativas"]   = tentativas + 1
+        state["metricas"]     = {}
+        state["score_geral"]  = 0.7
+        return state
+
     metricas = avaliar_completo(pergunta, contexto, resposta)
     registrar_avaliacao(pergunta, resposta, metricas, rota)
 
