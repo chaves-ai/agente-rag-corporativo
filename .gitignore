@@ -31,3 +31,4 @@ build/
 # Sistema
 .DS_Store
 Thumbs.db
+venv_windows_backup/

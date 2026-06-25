@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import agente
+from api.routers import agente, documentos
 
 app = FastAPI(
     title="Agente RAG Corporativo",
@@ -18,6 +18,8 @@ app.add_middleware(
 
 # Registra os routers
 app.include_router(agente.router)
+app.include_router(documentos.router)
+
 
 @app.get("/", tags=["Health"])
 async def root():

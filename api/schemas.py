@@ -25,3 +25,18 @@ class HealthResponse(BaseModel):
     status:  str
     versao:  str
     agente:  str
+
+# ── Schemas de Documentos ─────────────────────────────────
+class DocumentoResponse(BaseModel):
+    nome: str
+    chunks: int
+
+class ListaDocumentosResponse(BaseModel):
+    total_documentos: int
+    total_chunks: int
+    documentos: List[DocumentoResponse]
+
+class RemocaoResponse(BaseModel):
+    mensagem: str
+    documento: str
+    chunks_removidos: int
